@@ -1,0 +1,218 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#01000000"
+
+    tools:context="com.example.slowmo.smartvideoplayer.VideoPlayerActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Spinner
+            android:id="@+id/select_file"
+            android:layout_width="79dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5.36" />
+
+        <Switch
+            android:id="@+id/mode_switch"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5.09"
+            android:checked="true"
+            android:textOff="fixed"
+            android:textOn="smart" />
+
+        <Button
+            android:id="@+id/play_stop_btn"
+            android:layout_width="60dp"
+            android:layout_height="42dp"
+            android:layout_weight="0.24"
+            android:onClick="onclick_play_stop"
+            android:text="Play" />
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RadioGroup
+            android:id="@+id/select_fps"
+            android:layout_width="89dp"
+            android:layout_height="68dp" >
+
+            <RadioButton
+                android:id="@+id/fps10"
+                android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:text="10fps" />
+
+            <RadioButton
+                android:id="@+id/fps30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="30fps" />
+
+            <RadioButton
+                android:id="@+id/fps60"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="60fps" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+<!-- 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/frameNumberIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="time stamp: " />
+
+                <TextView
+                    android:id="@+id/timeStamp"
+                    android:layout_width="144dp"
+                    android:layout_height="wrap_content"
+                    android:text="0" />
+            </LinearLayout>
+ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/fpsIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="frame rate: " />
+
+                <TextView
+                    android:id="@+id/display_fps"
+                    android:layout_width="151dp"
+                    android:layout_height="wrap_content"
+                    android:text="0" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+               <!--  <TextView
+                    android:id="@+id/flowcount_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FlowCount: " />
+
+                <TextView
+                    android:id="@+id/display_flowcount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0" /> -->
+
+                <TextView
+                    android:id="@+id/firstIdx"
+                    android:layout_width="222dp"
+                    android:layout_height="wrap_content"
+                    android:text="first index: 0" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/lastIdx"
+                android:layout_width="224dp"
+                android:layout_height="wrap_content"
+                android:text="last index: 0" />
+
+        </LinearLayout>
+
+            <!-- <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+            <LinearLayout
+             android:layout_width="wrap_content"
+             android:layout_height="match_parent"
+             android:layout_weight="5.26" >
+            
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+            
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </LinearLayout>
+            
+                
+            </LinearLayout> -->
+         
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <SeekBar
+            android:id="@+id/timeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+	<LinearLayout
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        
+
+        <TextView
+            android:id="@+id/startTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:layout_marginLeft="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" 
+            android:gravity="end">
+         <TextView
+            android:id="@+id/endTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:text="00:00"
+            
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <TextureView
+        android:id="@+id/video_on_textureview"
+        android:layout_width="wrap_content"
+        android:layout_height="395dp" />
+
+</LinearLayout>
