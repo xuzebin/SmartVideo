@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.smartVideoPlayer.VideoPlayerActivity;
 import com.example.smartvideo.R;
+import com.example.utilities.Utils;
 
 /**
  * Video recorder activity.
@@ -115,6 +116,7 @@ public class VideoRecorderActivity extends Activity implements OnClickListener{
         
 //        preferences = getSharedPreferences("SmartVideo", Context.MODE_WORLD_READABLE);
 //        editor = preferences.edit();
+        
         
     }
 

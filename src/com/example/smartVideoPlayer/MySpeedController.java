@@ -23,8 +23,8 @@ import com.example.smartVideoPlayer.MainHandler;
 public class MySpeedController implements SpeedController {
 	private static final String TAG = "MySpeedController";
     private static final long ONE_MILLION = 1000000L;
-    private static final int NORMAL_FPS = 30;
-    private static final int MAX_FPS = 240;
+    private static final int NORMAL_FPS = 10;//30;
+    private static final int MAX_FPS = 30;//240;
 //    private static final int MIN_FPS = 10;
 //    private static final int FPS_CHANGE_RATE = 10; //per 100 msec
 //    private static final int THREE_HUNDRED_MSEC = 300;
@@ -76,7 +76,11 @@ public class MySpeedController implements SpeedController {
 	 *  */
 	public void setSmartPlaybackRate(int firstIndex, int lastIndex, int currentIndex) {
 		if (firstIndex == lastIndex) return;
-		
+		/**
+		 * high-fps recorded slow motion video playback adjustment
+		 * smoother speed change
+		 * 2016.4.15
+		 */
 		//speed up beginning
     	if (currentIndex < firstIndex) {
     		//let frame rate change more smoothly
@@ -88,7 +92,8 @@ public class MySpeedController implements SpeedController {
     		
     		if (diff > 2000) smooth_fps_begin = MAX_FPS;
     		
-    		smooth_fps_begin = smooth_fps_begin < 30 ? 30 : smooth_fps_begin;
+//    		smooth_fps_begin = smooth_fps_begin < 30 ? 30 : smooth_fps_begin;
+    		smooth_fps_begin = smooth_fps_begin < NORMAL_FPS ? NORMAL_FPS : smooth_fps_begin;
     		
     		setPlaybackRate(smooth_fps_begin);
     		Log.i(TAG, "begin_diff=" + diff + ", smooth_fps_begin=" + smooth_fps_begin);
@@ -102,18 +107,20 @@ public class MySpeedController implements SpeedController {
 //    		int smooth_fps = (diff / THREE_HUNDRED_MSEC) * FPS_CHANGE_RATE + NORMAL_FPS;
     		smooth_fps_end = smooth_fps_end + 2;
     		
-    		smooth_fps_end = smooth_fps_end > 240 ? 240 : smooth_fps_end;
+//    		smooth_fps_end = smooth_fps_end > 240 ? 240 : smooth_fps_end;
+    		smooth_fps_end = smooth_fps_end > MAX_FPS ? MAX_FPS : smooth_fps_end;
     		
     		setPlaybackRate(smooth_fps_end);
     		Log.i(TAG, "end_diff=" + diff + ", smooth_fps_end=" + smooth_fps_end);
     	}
     	
-    	//slow motion part
-    	if (currentIndex >= firstIndex && currentIndex < lastIndex) {
+
+//    	//slow motion part
+//    	if (currentIndex >= firstIndex && currentIndex < lastIndex) {
 //    		int middleIndex = (firstIndex + lastIndex) / 2;
 //    		int halfLength = (lastIndex - firstIndex) / 2;
 //    		
-//    		//let frame rate change more smoothly
+//    		//smoother frame rate change
 //    		if (currentIndex < middleIndex) {
 //    			int rate = (middleIndex - currentIndex) / halfLength;
 //    			
@@ -137,9 +144,9 @@ public class MySpeedController implements SpeedController {
 //    			}
 //    				
 //    		}
-//    	
-    		setPlaybackRate(NORMAL_FPS);
-    	}
+////    	
+//    		setPlaybackRate(NORMAL_FPS);
+//    	}
     	
 	}
     

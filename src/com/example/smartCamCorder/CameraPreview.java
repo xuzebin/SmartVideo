@@ -36,7 +36,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	
 	SurfaceHolder holder;
 	Camera mCamera;
-	MyPreviewCallback mPreviewCallback = null;
+	CamPreviewController mCamPreviewController = null;
 	TextPreviewHandler mTextPreviewHandler;
 	
     private byte[] callbackData;
@@ -84,16 +84,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	public void startCamera(SurfaceHolder holder) {
 		try {
 			mCamera = Camera.open(0);
+//			
+//			Camera.Size size = mCamera.getParameters().getPreviewSize();
+//			Utils.setPreviewSize(size.width, size.height);
 			
 			Parameters p = mCamera.getParameters();
 			p.setPreviewSize(Utils.PREVIEW_WIDTH, Utils.PREVIEW_HEIGHT);
 			p.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
 			p.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
 			p.setPreviewFormat(ImageFormat.NV21);
+//			p.setPreviewFormat(ImageFormat.YV12);
 			List<String> focusModes = p.getSupportedFocusModes();
 			if (focusModes.contains("continuous-video")) {
 				p.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 			}
+			
+//			p.setPreviewFpsRange(1000, 120000);
 
 			/**
 			 * This is a hint to make frame rate from preview callback higher.
@@ -129,11 +135,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		
 		if (openSound) mediaActionSound.play(MediaActionSound.START_VIDEO_RECORDING);
 		
-		if (mPreviewCallback == null) {		
-			mPreviewCallback = new MyPreviewCallback(mPreferences, mTextPreviewHandler);
+		if (mCamPreviewController == null) {		
+			mCamPreviewController = new CamPreviewController(mPreferences, mTextPreviewHandler);
 		}
 		
-		mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
+		mCamera.setPreviewCallbackWithBuffer(mCamPreviewController);
 		mCamera.addCallbackBuffer(callbackData);
 		mCamera.addCallbackBuffer(callbackData2);
 	}
@@ -142,9 +148,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		
 		if (openSound) mediaActionSound.play(MediaActionSound.STOP_VIDEO_RECORDING);
 		
-		if (mPreviewCallback != null) {
-			mPreviewCallback.close();
-			mPreviewCallback = null;
+		if (mCamPreviewController != null) {
+			mCamPreviewController.close();
+			mCamPreviewController = null;
 		}
 		if (mCamera != null) {
 			mCamera.setPreviewCallback(null);
@@ -156,7 +162,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	 * check if camera is recording video.
 	 */
 	public boolean isRecording() {
-		return mPreviewCallback != null;
+		return mCamPreviewController != null;
 	}
 	
 	/**

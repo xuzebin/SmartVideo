@@ -26,13 +26,13 @@ import android.util.Log;
  * When algorithm calculation for each frame is done, 
  * add callback buffer back in order for encoder thread to receive a new frame in onPreviewFrame().
  * In turn, when a new frame arrives in onPreviewFrame(), call notify() in
- * the encoder thread to the signal algorithm thread waiting to do calculations.
+ * the encoder thread to notify algorithm thread to do calculations.
  * 
  * @author xuzebin
  *
  */
-public class MyPreviewCallback implements PreviewCallback {
-	private static final String TAG = "MyPreviewCallback";
+public class CamPreviewController implements PreviewCallback {
+	private static final String TAG = "CamPreviewController";
 	
 	//time calculations
 	private long start = 0;
@@ -48,6 +48,7 @@ public class MyPreviewCallback implements PreviewCallback {
 	private Object object = new Object();//lock for threads
 	
 	private byte[] callbackBuffer;//a reference to the callback buffer
+	private byte[] grayData = new byte[Utils.PREVIEW_WIDTH * Utils.PREVIEW_HEIGHT];
 
 	//core components of video encoder
 	private VideoEncoder videoEncoder = null;
@@ -64,7 +65,7 @@ public class MyPreviewCallback implements PreviewCallback {
 	Camera mCamera = null;
 	
 	
-	public MyPreviewCallback(SharedPreferences preferences, TextPreviewHandler previewHandler) {
+	public CamPreviewController(SharedPreferences preferences, TextPreviewHandler previewHandler) {
 		mPreferences = preferences;
 		mEditor = mPreferences.edit();
 		mTextPreviewHandler = previewHandler;
@@ -73,6 +74,7 @@ public class MyPreviewCallback implements PreviewCallback {
 		timeStamp = 0;
 		videoEncoder = new VideoEncoder(FilePathManager.getVideoAbsoluteFileName(Utils.PREVIEW_WIDTH, Utils.PREVIEW_HEIGHT), 
 									Utils.PREVIEW_WIDTH, Utils.PREVIEW_HEIGHT);
+		
 		
 		boolean success = videoEncoder.initEncoder();
 		if (!success) {
@@ -88,11 +90,11 @@ public class MyPreviewCallback implements PreviewCallback {
 		videoEncoder.stop();//stop encoder
 		mTextPreviewHandler.signalEnd();//tell the main thread recording ends and reset UIs.
 		Log.e("index", "firstIndex: " + firstIndex + ", lastIndex: " + lastIndex);
-		saveIndexes(firstIndex, lastIndex);//save algorithm indexes
+		saveIndices(firstIndex, lastIndex);//save algorithm indexes
 		commitSavings();
 	}
 	
-	public void saveIndexes(int firstIndex, int lastIndex) {  
+	private void saveIndices(int firstIndex, int lastIndex) {  
 		//get the indexes calculated in native layer.
 		int indexes[] = SmartNative.getResultIndexes();
 		
@@ -110,7 +112,7 @@ public class MyPreviewCallback implements PreviewCallback {
 	}
 	
 	/* save frame time stamps (in millisecond) and flow count */
-	public void saveFlowCount(int time_stamp, int flow_count) {
+	private void saveFlowCount(int time_stamp, int flow_count) {
 		mEditor.putInt(Integer.toString(time_stamp), flow_count);
 		Log.i(TAG, "sharedpreferences editor putInt: pts[" + time_stamp + "]= flow_count: " + flow_count);
 	}
@@ -119,7 +121,7 @@ public class MyPreviewCallback implements PreviewCallback {
 	 * Must call this at the end to commit all savings into file 
 	 * We do not call this frequently because this I/O operation costs time 
 	 */
-	public void commitSavings() {
+	private void commitSavings() {
 		mEditor.commit();
 		Log.i(TAG, "sharedpreferences: data committed.");
 	}
@@ -159,7 +161,7 @@ public class MyPreviewCallback implements PreviewCallback {
 		
 	}
 	
-	public void startAlgorithmThread() {
+	private void startAlgorithmThread() {
 		new Thread(new Runnable() {
 			long algStart = 0, algEnd = 0;
 			long waitStart = 0,  waitEnd= 0;
@@ -186,8 +188,13 @@ public class MyPreviewCallback implements PreviewCallback {
 
 					algStart = System.nanoTime() / 1000;
 					
+					
+					//convert yuv data to gray data
+					NV21toGray(callbackBuffer, grayData, Utils.PREVIEW_WIDTH, Utils.PREVIEW_HEIGHT);
+					
+					
 					//calculate moving points using Optical flow algorithm
-					int pointCount = SmartNative.calOpticalFlow(callbackBuffer, 
+					int pointCount = SmartNative.calOpticalFlow(grayData, 
 							Utils.PREVIEW_WIDTH, Utils.PREVIEW_HEIGHT, algFrameCount, timeStamp);
 					
 					algEnd = System.nanoTime() / 1000 - algStart;
@@ -230,5 +237,12 @@ public class MyPreviewCallback implements PreviewCallback {
 		}).start();
 	}
 
+	private void NV21toGray(byte[] nv21bytes, byte[] gray,
+			int width, int height) {
+		System.arraycopy(nv21bytes, 0, gray, 0, width * height);
+		for (int i = 0; i < width * height; ++i) {
+			gray[i] = nv21bytes[i];
+		}
+	}
 
 }

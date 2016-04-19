@@ -62,9 +62,9 @@ import android.view.TextureView;
  */
 public class VideoPlayerActivity extends Activity implements TextureView.SurfaceTextureListener, 
 													OnItemSelectedListener {
-	private static final String TAG = "DecoderActivity";
+	private static final String TAG = "VideoPlayerActivity";
 	
-	private static final int DEFAULT_FRAME_RATE = 30;
+	private static final int DEFAULT_FRAME_RATE = -1;//default
 	private static String fileDirectory;
 	
 	private File selectedFile = null;
@@ -172,7 +172,7 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
         
         mTextureView = (TextureView) findViewById(R.id.video_on_textureview);
         mTextureView.setSurfaceTextureListener(this);
-//        mTextureView.setRotation(90.0f);
+        mTextureView.setRotation(90.0f);
         
 
         /**
@@ -224,7 +224,7 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 					button_10fps.setEnabled(true);
 					button_30fps.setEnabled(true);
 					button_60fps.setEnabled(true);
-		            changeFPS(30);
+		            changeFPS(DEFAULT_FRAME_RATE);
 		            
 				}
 				
@@ -350,13 +350,13 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 	public void setIndexesView(boolean isSmartMode) {
 		if (isSmartMode) {
 			if (preferences.contains("firstIndex")) {
-//				firstIndex = preferences.getInt("firstIndex", 0);
-				firstIndex = 7083;
+				firstIndex = preferences.getInt("firstIndex", 0);
+//				firstIndex = 7083;
 				firstIdx_view.setText("first index: " + (firstIndex / 1000.0) + " s");
 			}
 			if (preferences.contains("lastIndex")) {
-//				lastIndex = preferences.getInt("lastIndex", 0);
-				lastIndex = 15230;
+				lastIndex = preferences.getInt("lastIndex", 0);
+//				lastIndex = 15230;
 				lastIdx_view.setText("last index: " + (lastIndex / 1000.0) + " s");
 			}
 			

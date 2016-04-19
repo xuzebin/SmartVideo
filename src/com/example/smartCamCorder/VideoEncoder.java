@@ -48,7 +48,7 @@ public class VideoEncoder {
 	 * is the key frame here the I_FRAME_INTERVAL is 0 second
 	 */
 	private static final int I_FRAME_INTERVAL = 0;
-	private static final int FRAME_RATE = 30;
+	private static final int FRAME_RATE = 120;
 	private static final int COMPRESS_RATIO = 128;//256;
 	private static final int COLOR_CHANNEL = 3;
 	private static final int BITS_PER_BYTE = 8;

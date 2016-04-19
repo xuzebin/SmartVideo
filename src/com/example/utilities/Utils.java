@@ -26,8 +26,13 @@ public class Utils {
 	private Utils(){}
 	
 	//camera preview size
-	public static final int PREVIEW_WIDTH = 1280;
-	public static final int PREVIEW_HEIGHT = 720;
+	public static int PREVIEW_WIDTH = 1024;//320;//640;//1024;//1280;
+	public static int PREVIEW_HEIGHT = 768;//240;//480;// 768;//720;
+	
+	public static void setPreviewSize(int width, int height) {
+		PREVIEW_WIDTH = width;
+		PREVIEW_HEIGHT = height;			
+	}
 	
 	/**
 	 * Get the string of formatted time to display.
