@@ -81,8 +81,8 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 	
 	Surface surface;
 	SurfaceTexture surfaceTexture;
-	
-	private VideoDecoderThread decoder = null;
+
+	private VideoPlayer videoPlayer = null;
 	MySpeedController controller;
 	
 	/* UIs */
@@ -186,14 +186,14 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 			public boolean onTouch(View arg0, MotionEvent arg1) {
 				// TODO Auto-generated method stub	
 				if (arg1.getAction() == MotionEvent.ACTION_DOWN) {				
-					if (!decoder.isPause()) {
+					if (!videoPlayer.isPause()) {
 						//pause the video
-						decoder.pause();			
+						videoPlayer.pause();			
 						Toast toast = Toast.makeText(getApplicationContext(), "Pause", Toast.LENGTH_SHORT);
 						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();
 					} else {
-						decoder.resume();
+						videoPlayer.resume();
 						Toast toast = Toast.makeText(getApplicationContext(), "Resume", Toast.LENGTH_SHORT);
 						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();
@@ -302,9 +302,9 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-		if (decoder != null) {
-			decoder.stopPlaying();
-			decoder = null;
+		if (videoPlayer != null) {
+			videoPlayer.stopPlaying();
+			videoPlayer = null;
 		}
     }
 	
@@ -435,10 +435,10 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
         		mHandler = new MainHandler(this);
         	}
     		
-    		initializeDecoder();
+    		initPlayer();
     		
         	
-        	decoder.startPlaying();//start the video decoding thread here
+    		videoPlayer.startPlaying();//start the video decoding thread here
         	
     	} else {
     		Log.d(TAG, "failed to open file in: " + fileDirectory);
@@ -447,10 +447,10 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 	}
     
     public void stopVideo() {
-		if (decoder != null) {
-			decoder.stopPlaying();//delete the thread
-			decoder = null;
-			Log.i(TAG, "decoder.stopPlaying()");
+		if (videoPlayer != null) {
+			videoPlayer.stopPlaying();//delete the thread
+			videoPlayer = null;
+			Log.i(TAG, "videoPlayer.stopPlaying()");
 		}
 		if (controller != null) {
 			controller = null;	
@@ -460,7 +460,7 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 		}
     }
     
-    public void initializeDecoder() {
+    public void initPlayer() {
     	changeFPS(selectedFPS);
     			
 		Log.i(TAG, " getting surfaceTexture...");
@@ -469,15 +469,15 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 		Log.i(TAG, "initializing surface...");
 		surface = new Surface(surfaceTexture);
 		
-	  	if (decoder == null) {
-	  		Log.i(TAG, "decoder == null, initializing decoder...");
+	  	if (videoPlayer == null) {
+	  		Log.i(TAG, "videoPlayer == null, initializing videoPlayer...");
 	  		//initialize all the decoding stuff here.
-	   		decoder = new VideoDecoderThread(new VideoDecoderCore(selectedFile, surface, controller, mHandler));
+	  		videoPlayer = new VideoPlayer(selectedFile, surface, controller, mHandler);
 	    }  
 	  	
-	  	decoder.setLoop(false);//set true to keep looping.
+	  	videoPlayer.setLoop(false);//set true to keep looping.
 	  	
-	  	adjustAspectRatio(decoder.getWidth(), decoder.getHeight());
+	  	adjustAspectRatio(videoPlayer.getWidth(), videoPlayer.getHeight());
     }
     
     public void changeFPS(int fps) {
@@ -600,7 +600,7 @@ public class VideoPlayerActivity extends Activity implements TextureView.Surface
 			// TODO Auto-generated method stub
 			Log.i("seekBar", "onProgressChanged: " + seekBar.getProgress());
 			if (fromUser) {			
-				decoder.seekTo(progress, preProgress);
+				videoPlayer.seekTo(progress, preProgress);
 				Log.i("seekBar", "user moving bar");
 			} else {//from the video playback itself
 				Log.i("seekBar", "bar auto moving");

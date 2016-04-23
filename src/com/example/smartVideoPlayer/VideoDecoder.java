@@ -48,7 +48,7 @@ import android.view.Surface;
  * 2. Bugs to fix:
  * 	2.1 sampleNumber is not accurate when seeking (however, this will not affect playback).
  */
-public class VideoDecoderCore {
+public class VideoDecoder {
 	private static final String TAG = "DecoderCore";
 
 	private BufferInfo bufferInfo;
@@ -110,7 +110,7 @@ public class VideoDecoderCore {
      * @param controller: Speed controller for frame rate control.
      * @param handler: Handler from main thread for UI updates.
      */
-    VideoDecoderCore(File videoFile_, Surface outputSurface_, SpeedController controller_, MainHandler handler_) {
+    VideoDecoder(File videoFile_, Surface outputSurface_, SpeedController controller_, MainHandler handler_) {
     	videoFile = videoFile_;
     	outputSurface = outputSurface_;
     	controller = controller_;
@@ -120,7 +120,7 @@ public class VideoDecoderCore {
     }
     
     //When reading video file from res/raw, use AssetFileDescriptor
-    VideoDecoderCore(AssetFileDescriptor assetFileDescriptor_, Surface outputSurface_, SpeedController controller_) {
+    VideoDecoder(AssetFileDescriptor assetFileDescriptor_, Surface outputSurface_, SpeedController controller_) {
     	mAssetFileDescriptor = assetFileDescriptor_;
     	outputSurface = outputSurface_;
     	controller = controller_;

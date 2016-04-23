@@ -2,7 +2,7 @@ package com.example.smartVideoPlayer;
 
 import android.util.Log;
 
-import com.example.smartVideoPlayer.VideoDecoderCore.SpeedController;
+import com.example.smartVideoPlayer.VideoDecoder.SpeedController;
 import com.example.smartVideoPlayer.MainHandler;
 
 /**

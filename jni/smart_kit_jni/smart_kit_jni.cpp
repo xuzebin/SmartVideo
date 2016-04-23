@@ -15,6 +15,8 @@
 #include <float.h>
 
 
+
+
 /* GLOBAL VARIABLES */
 int downsize[2] = {64, 36};//36; //size of downsize
 float debug_values[32]; //debug values for display
@@ -24,6 +26,22 @@ int last_index = 0;
 
 const long MSEC_PER_FRAME = 30;//unit: millisecond
 const long SKIP_FRAMES_NUMBER = 30;
+
+//
+//  DenseOpticalFlow
+//
+//  Created by xuzebin on 15/9/2.
+//  Copyright (c) 2015 xuzebin. All rights reserved.
+//
+// Gunnar Farneback 2D dense optical flow algorithm
+// call API calcOpticalFlowFarneback() in OpenCV
+
+using namespace cv;
+cv::Mat prevgray, gray, flow;//global variables
+
+
+ExtractFeatures* extract_features = new ExtractFeatures(downsize[0], downsize[1], 12);//create a histogram with 12 bins
+Classifier* classifier = new Classifier();
 
 
 int dense_optical_flow(unsigned char* yuvframe, int width, int height, int frame_index, long time_stamp);
@@ -130,7 +148,8 @@ extern "C" JNIEXPORT jint Java_com_example_smartNative_SmartNative_calOpticalFlo
 extern "C" JNIEXPORT jintArray Java_com_example_smartNative_SmartNative_getResultIndexes( JNIEnv* env,
         jobject thiz)
 {
-	int result_indxes[2] = {first_index, last_index};
+//	int result_indxes[2] = {first_index, last_index};
+	int reuslt_indices[2] = {classifer->getFirstIndex(), classifer->getLastIndex()};
 	jintArray jniIndexes = env->NewIntArray(2);
 	env->SetIntArrayRegion(jniIndexes, 0, 2, result_indxes);
 
@@ -146,23 +165,7 @@ extern "C" JNIEXPORT jintArray Java_com_example_smartNative_SmartNative_getDownS
 	return jniDownSize;
 }
 
-//
-//  DenseOpticalFlow
-//
-//  Created by xuzebin on 15/9/2.
-//  Copyright (c) 2015 xuzebin. All rights reserved.
-//
-// Gunnar Farneback 2D dense optical flow algorithm
-// call API calcOpticalFlowFarneback() in OpenCV
 
-using namespace cv;
-cv::Mat prevgray, gray, flow;//global variables
-
-
-
-
-ExtractFeatures* extract_features = new ExtractFeatures(downsize[0], downsize[1], 12);//create a histogram with 12 bins
-Classifier* classifier = new Classifier();
 int dense_optical_flow(unsigned char* yuvframe, int width, int height, int frame_index, long time_stamp)
 {
     /* a trick to calculate after 50 frames to avoid initial unstable values */
@@ -223,11 +226,13 @@ int dense_optical_flow(unsigned char* yuvframe, int width, int height, int frame
         debug_values[10] = max_bin;
         debug_values[11] = extract_features->getFlowCount();
 
-        float avg = classifier->setFeatures(extract_features->getFlowCount(), max_bin_index, max_bin);
-        debug_values[12] = avg;
+//        float avg = classifier->setFeatures(extract_features->getFlowCount(), max_bin_index, max_bin);
+//        debug_values[12] = avg;
+//
+////        judgeIndexes(frame_index);
+//        judgeTimeStamps(time_stamp);
 
-//        judgeIndexes(frame_index);
-        judgeTimeStamps(time_stamp);
+        classifer->classify(extract_features->getFlowCount(), max_bin_index, max_bin, time_stamp);
 
     }
 

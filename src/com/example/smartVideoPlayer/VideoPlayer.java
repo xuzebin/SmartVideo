@@ -1,10 +1,13 @@
 package com.example.smartVideoPlayer;
 
+import java.io.File;
+
 import android.util.Log;
+import android.view.Surface;
 
 
 /**
- * DecoderThread.java
+ * VideoPlayer.java
  * A separate thread for decoder.
  * Handle interactions between VideoDecoderCore and VideoPlayerActivity.
  * Author: xuzebin
@@ -12,17 +15,24 @@ import android.util.Log;
  * 
  * Updated (01/12/2016): Change the relationship from is-a to has-a. 
  * 						 Own the DecoderCore instance itself rather than inheriting from it.
+ * 
+ * Updated on 04/20/2016: Rename VideoDecoderThread to VideoPlayer, VideoDecoderCore to VideoDecoder.
+ * 						  Create VideoDecoder instance inside VideoPlayer class rather than initializing it outside.
  */
 
-public class VideoDecoderThread implements Runnable {
+public class VideoPlayer implements Runnable {
 	private static final String TAG = "DecoderCore";
 	private static final long ONE_MILLION = 1000000L;
-	VideoDecoderCore decoderCore;
+	VideoDecoder decoder;
 
-	public VideoDecoderThread(VideoDecoderCore decoderCore) {
-		this.decoderCore = decoderCore;
+	public VideoPlayer(VideoDecoder decoder) {
+		this.decoder = decoder;
 		
-		decoderCore.initDecoder();
+		decoder.initDecoder();
+	}
+	public VideoPlayer(File selectedFile, Surface surface, MySpeedController controller, MainHandler handler) {
+		decoder = new VideoDecoder(selectedFile, surface, controller, handler);
+		decoder.initDecoder();
 	}
 
 	@Override
@@ -30,10 +40,10 @@ public class VideoDecoderThread implements Runnable {
 		// TODO Auto-generated method stub
 		long start = System.nanoTime();
 				
-		decoderCore.startDecoding();	//core components for decoding
+		decoder.startDecoding();	//core components for decoding
 		Log.i(TAG, "decode time: " + (System.nanoTime() - start) / ONE_MILLION + "ms");			
 		
-		decoderCore.dumpVideoInfo();
+		decoder.dumpVideoInfo();
 	}
 	
 	public void startPlaying() {
@@ -42,36 +52,36 @@ public class VideoDecoderThread implements Runnable {
 	}
 	
 	public void stopPlaying() {
-		decoderCore.stop();
+		decoder.stop();
 	}
 	
 	public void pause() {
-		decoderCore.pause();
+		decoder.pause();
 	}
 	public void resume() {
-		decoderCore.resume();
+		decoder.resume();
 	}
 	
 	public boolean isPause() {
-		return decoderCore.isPause();
+		return decoder.isPause();
 	}
 	
 	
 	public void seekTo(long progress, long preProgress) {
-		if (decoderCore != null) {
-			decoderCore.seekTo(progress, preProgress);
+		if (decoder != null) {
+			decoder.seekTo(progress, preProgress);
 		}
 	}
 	
 	public int getWidth() {
-		return decoderCore.getWidth();
+		return decoder.getWidth();
 	}
 	
 	public int getHeight() {
-		return decoderCore.getHeight();
+		return decoder.getHeight();
 	}
 	
 	public void setLoop(boolean isLoop) {
-		decoderCore.setLoop(isLoop);
+		decoder.setLoop(isLoop);
 	}
 }

@@ -16,9 +16,11 @@ public:
 	virtual ~Classifier();
 
 	void reset();
-	double setFeatures(int flow_count, int max_bin_index, double max_bin);
+	double recordFeatures(int flow_count, int max_bin_index, double max_bin);
 
-	double calFeatures();
+	double classify(int flow_count, int max_bin_index, double max_bin, int time_stamp);
+	int getFirstIndex();
+	int getLastIndex();
 
 private:
 	int flow_count;
@@ -32,6 +34,11 @@ private:
 
     double max_bin_sum;
     double max_bin_thres;
+
+
+    //classification result
+    int first_index;
+    int last_index;
 
 
 

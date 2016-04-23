@@ -17,6 +17,7 @@ Classifier::Classifier() {
 //	flow_count_sum = 0;
 	max_bin_sum = 0;
 	max_bin_thres = 2000;
+
 }
 
 Classifier::~Classifier() {
@@ -27,9 +28,8 @@ void Classifier::reset() {
 	flow_count = 0;
 	max_bin_index = 0;
 	max_bin = 0;
-
 }
-double Classifier::setFeatures(int flow_count, int max_bin_index, double max_bin) {
+double Classifier::recordFeatures(int flow_count, int max_bin_index, double max_bin) {
 	this->flow_count = flow_count;
 	this->max_bin_index = max_bin_index;
 	this->max_bin = max_bin;
@@ -56,17 +56,43 @@ double Classifier::setFeatures(int flow_count, int max_bin_index, double max_bin
 	return 0;
 }
 
-double Classifier::calFeatures() {
-//	acc_count.push(flow_count);
+bool Classifier::classify(int flow_count, int max_bin_index, double max_bin, int time_stamp) {
+	double max_bin_avg = recordFeatures(flow_count, max_bin_index, max_bin);
 
+    bool isMotion = true;
+	//exclude camera motion
+	if (max_bin > 500 || flow_count > downsize[0] * downsize[1] / 6
+					|| max_bin_avg > 400) {
+		//camera motion
+		isMotion = false;
+	}
 
+	//exclude static scene
+	if (max_bin < 80 || flow_count < 80) {
+		//static
+		isMotion = false;
+	}
 
+	if (isMotion) {//object motion
+		if (time_stamp > SKIP_FRAMES_NUMBER * MSEC_PER_FRAME) {//avoid the initial instability
+			if (first_index == 0) {
+				first_index = time_stamp;//record the first motion
+			}
 
+			last_index = time_stamp;//record the last motion
+		}
 
+	}
+	return isMotion;
 
-	return 0;
 }
 
+int Classifier::getFirstIndex() {
+	return first_index;
+}
+int Classifier::getLastIndex() {
+	return last_index;
+}
 
 
 
